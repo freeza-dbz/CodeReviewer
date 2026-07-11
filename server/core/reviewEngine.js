@@ -1,6 +1,6 @@
-// import {runPipeline} from "./pipeline.js"
-
+import {runPipeline} from "./pipeline.js"
 import { ApiError } from "../utils/ApiError"
+
 
 const review = async (sourceCode) => {
 
@@ -13,8 +13,9 @@ const review = async (sourceCode) => {
         throw new ApiError(404, "Empty source code provided")
     }
 
-    // const report = => Call Pipeline 
-    return report
+    const report = await runPipeline(sourceCode)
+ 
+    throw new ApiResponse(200, "Review Successful", report)
 
     } catch (error) {
         throw new ApiError(400, error.message || "Review Failed")
