@@ -4,6 +4,7 @@ import path from "path"
 import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
 import { review } from "./core/reviewEngine.js";
+import { readFileContent } from "./input/fileReader.js";
 
 
 async function main() {
@@ -20,7 +21,7 @@ async function main() {
 
         if (fs.existsSync(input) && fs.statSync(input).isFile()) {
             const filePath = path.resolve(input);
-            // sourceCode = await => Read source code
+            sourceCode = await readFileContent(filePath)
         } else {
             // sourceCode = => Read pasted code 
         }
