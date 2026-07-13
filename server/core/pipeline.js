@@ -1,13 +1,14 @@
 import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { detectLanguage } from "../language/detectLanguage.js";
 
 
 
 const runPipeline = async (sourceCode) => {
 
     try {
-        // const language =  => Call Detect language here
-
+        const language = await detectLanguage(sourceCode);
+        
         // const staticAnalyzer = await  => Call static analysis here
 
         // const prompt = buildPrompt({  => Build prompt
