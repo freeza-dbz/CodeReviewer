@@ -2,7 +2,7 @@ import { ApiError } from "../utils/ApiError";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { detectLanguage } from "../language/detectLanguage.js";
 import { staticAnalyzer } from "../analysis/staticAnalyzer.js";
-
+import { buildPrompt } from "../prompt/promptBuilder.js";
 
 const runPipeline = async (sourceCode) => {
 
@@ -11,11 +11,11 @@ const runPipeline = async (sourceCode) => {
         
        const staticAnalyzer = await staticAnalyzer(sourceCode, language);
 
-        // const prompt = buildPrompt({  => Build prompt
-        //     sourceCode,
-        //     language,
-        //     staticAnalysis
-        // })
+        const prompt = buildPrompt({ 
+            sourceCode,
+            language,
+            staticAnalysis
+        })
 
         // const llmResponse = await => Call LLM review
 

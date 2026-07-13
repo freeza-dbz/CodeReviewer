@@ -5,6 +5,7 @@ import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
 import { review } from "./core/reviewEngine.js";
 import { readFileContent } from "./input/fileReader.js";
+import { readPastedCode } from "./input/pastedCodeReader.js";
 
 
 async function main() {
@@ -23,7 +24,7 @@ async function main() {
             const filePath = path.resolve(input);
             sourceCode = await readFileContent(filePath)
         } else {
-            // sourceCode = => Read pasted code 
+            sourceCode = readPastedCode(input) 
         }
 
         const reviewResult = await review(sourceCode)
