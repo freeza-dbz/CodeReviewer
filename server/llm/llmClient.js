@@ -1,7 +1,7 @@
 import OpenAi, { APIError } from "openai";
 import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
-import { logger } from "./utils/logger.js";
+import { logger } from "./utils/logger.js"; 
 
 
 const client = new OpenAi({

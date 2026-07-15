@@ -5,7 +5,7 @@ const formatResult = function ({ language, staticAnalysis, parsedReview }) {
 
     try {
         let output = "";
-
+ 
         output += "\n";
         output += "====================================================\n";
         output += "               AI CODE REVIEW REPORT\n";

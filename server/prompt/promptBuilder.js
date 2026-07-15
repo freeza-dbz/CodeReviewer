@@ -7,7 +7,7 @@ import { logger } from "../utils/logger.js";
 const buildPrompt = ({ sourceCode, language, staticAnalysis }) => {
 
     try {
-        let prompt = "";
+        let prompt = ""; 
 
         prompt += `${SYSTEM_PROMPT}\n\n`;
 

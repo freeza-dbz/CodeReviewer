@@ -38,7 +38,7 @@ const runPipeline = async (sourceCode) => {
 
         const parsedReview = await parseResponse(llmResponse)
 
-        await logger("Formatting report....")
+        await logger("Formatting report....") 
 
         const formatReport = formatResult({     
             language,

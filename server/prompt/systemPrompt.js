@@ -12,7 +12,7 @@ const SYSTEM_PROMPT = `
 
     Return ONLY valid JSON.
 
-    Use this structure:
+    Use this structure: 
 
     {
     "summary": "",
