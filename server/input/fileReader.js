@@ -1,4 +1,5 @@
 import { promises as fs } from "fs";
+import { logger } from "../utils/logger.js";
 
 const readFileContent = async (filePath) => {
 
@@ -15,11 +16,20 @@ const readFileContent = async (filePath) => {
     try {
         const fileBuffer = await fs.readFile(filePath)
 
+        await logger(`Reading File ${filePath}`)
+
         const sourceCode = fileBuffer.toString()
+
+        await logger(`File read successfully`)
 
         return sourceCode
 
     } catch (error) {
+
+        await logger(`File not found: ${filePath}`, {
+            level: "ERROR",
+            writeToFile: true
+        });
 
         throw new ApiError(500, "Error reading file")
 

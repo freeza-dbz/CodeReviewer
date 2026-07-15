@@ -1,12 +1,16 @@
 import fs, { read, readFile } from "fs"
 import path from "path"
+import "dotenv/config";
 
 import { ApiError } from "./utils/ApiError.js";
 import { ApiResponse } from "./utils/ApiResponse.js";
 import { review } from "./core/reviewEngine.js";
 import { readFileContent } from "./input/fileReader.js";
 import { readPastedCode } from "./input/pastedCodeReader.js";
+import { logger } from "./utils/logger.js";
 
+
+await logger("AI Code review started")
 
 async function main() {
     try {
@@ -27,12 +31,14 @@ async function main() {
             sourceCode = readPastedCode(input) 
         }
 
-        const reviewResult = await review(sourceCode)
+        await logger(`Input received`);
 
-        // const report = => Format report 
+        const reviewResult = await review(sourceCode)
 
         throw new ApiResponse(200, "Review Successful", report)
 
+        await logger("Review completed successfully.");
+        
         process.exit(0);
 
     } catch (error) {

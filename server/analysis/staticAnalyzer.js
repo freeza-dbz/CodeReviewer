@@ -1,4 +1,5 @@
 import { ApiError } from "../utils/ApiError";
+import { logger } from "../utils/logger";
 
 const staticAnalyzer = function (sourceCode, language = "") {
 
@@ -87,9 +88,12 @@ const staticAnalyzer = function (sourceCode, language = "") {
             }
         }
 
+        
         return analysis;
     } catch (error) {
         throw new ApiError(400, error.message || "Static analysis failed")
+
+        await logger(`Static analysis failed with error: ${error.message}`)
     }
 
 }

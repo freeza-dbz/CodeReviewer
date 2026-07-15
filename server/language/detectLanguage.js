@@ -44,6 +44,8 @@ const EXTENSION_MAP = {
 }
 
 import { ApiError } from "../utils/ApiError.js"
+import { logger } from "../utils/logger.js"
+
 
 const detectLanguage = (sourceCode, filePath = "") => {
 
@@ -55,6 +57,7 @@ const detectLanguage = (sourceCode, filePath = "") => {
             }
         } else {
             throw new ApiError(404, "No file found")
+            await logger("No file found")
         }
 
         const scores = {};
@@ -84,7 +87,8 @@ const detectLanguage = (sourceCode, filePath = "") => {
         return detectLanguage;
 
     } catch (error) {
-        throw new ApiError(404, "Error occured while detecting language")
+        throw new ApiError(404, "Error occured while detecting language", error.message)
+        await logger(`Language detection failed with error : ${error.message}`)
     }
 
 }
