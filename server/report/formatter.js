@@ -87,9 +87,8 @@ const formatResult = function ({ language, staticAnalysis, parsedReview }) {
 
         return output;
     } catch (error) {
+        logger(`Report formatting failed with error: ${error.message}`)
         throw new ApiError(400, error.message || "Report formatting failed")
-
-        await logger(`Report formatting failed with error: ${error.message}`)
     }
 
 }

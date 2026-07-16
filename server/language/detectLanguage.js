@@ -47,17 +47,14 @@ import { ApiError } from "../utils/ApiError.js"
 import { logger } from "../utils/logger.js" 
 
 
-const detectLanguage = (sourceCode, filePath = "") => {
+const detectLanguage = async (sourceCode, filePath = "") => {
 
     try {
         if (filePath) {
-            const extentsion = filePath.split('.').pop();
-            if (EXTENSION_MAP[extentsion]) {
-                return EXTENSION_MAP[extentsion];
+            const extension = filePath.split('.').pop();
+            if (EXTENSION_MAP[extension]) {
+                return EXTENSION_MAP[extension];
             }
-        } else {
-            throw new ApiError(404, "No file found")
-            await logger("No file found")
         }
 
         const scores = {};
@@ -87,8 +84,8 @@ const detectLanguage = (sourceCode, filePath = "") => {
         return detectLanguage;
 
     } catch (error) {
-        throw new ApiError(404, "Error occured while detecting language", error.message)
         await logger(`Language detection failed with error : ${error.message}`)
+        throw new ApiError(404, "Error occured while detecting language", error.message)
     }
 
 }

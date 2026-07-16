@@ -33,8 +33,8 @@ const buildPrompt = ({ sourceCode, language, staticAnalysis }) => {
 
         return prompt;
     } catch (error) {
+        logger(`Prompt building failed with error: ${error.message}`)
         throw new ApiError(400, error.message || "Prompt building failed")
-        await logger(`Prompt building failed with error: ${error.message}`)
     }
 
 }

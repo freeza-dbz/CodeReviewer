@@ -1,4 +1,4 @@
-import { ApiError } from "../utils/ApiError";
+import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { detectLanguage } from "../language/detectLanguage.js";
 import { staticAnalyzer } from "../analysis/staticAnalyzer.js";
@@ -30,7 +30,7 @@ const runPipeline = async (sourceCode) => {
             staticAnalysis
         })
 
-        await logger(`Sending request to LLM ${prompt}`)
+        await logger("Sending request to LLM....")
 
         const llmResponse = await getLLMReview(prompt)
 
@@ -48,12 +48,11 @@ const runPipeline = async (sourceCode) => {
 
         await logger("Review Successful")
 
-        throw new ApiResponse(200, "Review Successful", formatReport)
+        return formatReport;
 
     } catch (error) {
-        throw new ApiError(400, error.message || "Review Failed")
-        
         await logger(`Review Failed with error: ${error.message}`)
+        throw new ApiError(400, error.message || "Review Failed")
     }
 
 }

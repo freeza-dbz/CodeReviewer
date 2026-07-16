@@ -1,12 +1,10 @@
-import OpenAi, { APIError } from "openai";
-import { ApiError } from "./utils/ApiError.js";
-import { ApiResponse } from "./utils/ApiResponse.js";
-import { logger } from "./utils/logger.js"; 
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { ApiError } from "../utils/ApiError.js";
+import { logger } from "../utils/logger.js"; 
 
 
-const client = new OpenAi({
-    apikey: process.env.OPENAI_API_KEY
-})
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
 
 const MAX_RETRIES = 3;
 
@@ -17,27 +15,26 @@ const getLLMReview = async (prompt) => {
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
-                const response = await client.response.create({
-                    model: "gpt-5.5",
-                    input: prompt
-                })
-                return response;
+                const result = await model.generateContent(prompt);
+                const response = result.response;
+                const text = response.text();
+                return text;
             } catch (error) {
                 lastError = error;
 
-                if (attemp === MAX_RETRIES) {
+                if (attempt === MAX_RETRIES) {
                     break;
                 }
 
-                await logger(`Attempt ${attempt} failed with error: ${error.message}. Retrying in 1 second...}`)
+                await logger(`Attempt ${attempt} failed with error: ${error.message}. Retrying in 1 second...`)
 
                 await delay(1000 * attempt);
             }
         }
+        throw lastError;
     } catch (error) {
-        throw new ApiError(400, "LLM request failed", error.message)
-        
         await logger(`LLM request failed with error: ${error.message}`)
+        throw new ApiError(400, "LLM request failed: " + error.message)
     }
 }
 

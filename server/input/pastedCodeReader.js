@@ -1,8 +1,6 @@
 import { logger } from "../utils/logger.js"; 
 
-initialInput = ""
-
-export function readPastedCode()   {
+export function readPastedCode(initialInput = "")   {
     return new Promise((resolve, reject) => {
 
         let sourceCode = initialInput;
@@ -31,7 +29,7 @@ export function readPastedCode()   {
             resolve(sourceCode);
         })
 
-        await logger(`Source Code received ${sourceCode}`)
+        logger(`Source Code received ${sourceCode}`);
 
         process.stdin.on("error", (err) => {
             reject(err);

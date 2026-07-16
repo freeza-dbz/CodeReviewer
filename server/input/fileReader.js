@@ -1,5 +1,6 @@
 import { promises as fs } from "fs";
 import { logger } from "../utils/logger.js"; 
+import { ApiError } from "../utils/ApiError.js"; 
 
 const readFileContent = async (filePath) => {
 
