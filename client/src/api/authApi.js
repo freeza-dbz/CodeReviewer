@@ -1,26 +1,25 @@
-// Mocked auth API
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+import axios from 'axios';
 
 export const login = async (credentials) => {
-  await delay(800);
-  if (credentials.email === 'test@example.com' && credentials.password === 'password') {
-    return {
-      token: 'mock-jwt-token-123',
-      user: { id: 'u1', name: 'Test User', email: 'test@example.com', avatar: 'https://i.pravatar.cc/150?u=u1' },
-    };
-  }
-  throw new Error('Invalid credentials. Try test@example.com / password');
+  const { data } = await axios.post('/api/auth/login', credentials);
+  return data.data;
 };
 
 export const signup = async (userData) => {
-  await delay(800);
-  return {
-    token: 'mock-jwt-token-123',
-    user: { id: 'u2', name: userData.name, email: userData.email, avatar: 'https://i.pravatar.cc/150?u=u2' },
-  };
+  const { data } = await axios.post('/api/auth/signup', userData);
+  return data.data;
 };
 
 export const logout = async () => {
-  await delay(300);
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      await axios.post('/api/auth/logout', {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return { success: true };
 };

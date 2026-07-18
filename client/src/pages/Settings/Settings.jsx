@@ -1,15 +1,33 @@
 import React, { useState } from 'react';
 import Button from '../../components/Button/Button';
 import toast from 'react-hot-toast';
+import { useContext, useEffect } from 'react';
+import { ThemeContext } from '../../context/ThemeContext';
+import { useAuth } from '../../hooks/useAuth';
+import { updateSettings } from '../../api/userApi';
 
 const Settings = () => {
+  const { theme, setTheme: setGlobalTheme } = useContext(ThemeContext);
+  const { user, updateUser } = useAuth();
+  
   const [settings, setSettings] = useState({
-    theme: 'dark',
-    fontSize: '14',
-    defaultLanguage: 'javascript',
-    aiModel: 'gpt-4o',
+    theme: theme || 'dark',
+    aiModel: 'gemini-3.5-flash',
+    apiKey: '',
     notifications: true,
   });
+  
+  useEffect(() => {
+    if (user) {
+      setSettings((prev) => ({
+        ...prev,
+        theme: user.theme || prev.theme,
+        aiModel: user.preferredModel || prev.aiModel,
+        apiKey: user.apiKey || prev.apiKey,
+      }));
+    }
+  }, [user]);
+
   const [saving, setSaving] = useState(false);
 
   const handleChange = (e) => {
@@ -19,11 +37,21 @@ const Settings = () => {
 
   const handleSave = async () => {
     setSaving(true);
-    // mock save
-    setTimeout(() => {
-      setSaving(false);
+    try {
+      const res = await updateSettings({
+        preferredModel: settings.aiModel,
+        apiKey: settings.apiKey,
+        theme: settings.theme,
+      });
+      setGlobalTheme(settings.theme);
+      updateUser(res.data);
       toast.success('Settings saved successfully!');
-    }, 800);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -42,16 +70,6 @@ const Settings = () => {
               <select name="theme" value={settings.theme} onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white">
                 <option value="dark">Dark</option>
                 <option value="light">Light</option>
-                <option value="system">System</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Editor Font Size</label>
-              <select name="fontSize" value={settings.fontSize} onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white">
-                <option value="12">12px</option>
-                <option value="14">14px</option>
-                <option value="16">16px</option>
-                <option value="18">18px</option>
               </select>
             </div>
           </div>
@@ -61,22 +79,26 @@ const Settings = () => {
           <h2 className="text-xl font-medium text-white mb-4">Review Preferences</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">Default Language</label>
-              <select name="defaultLanguage" value={settings.defaultLanguage} onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white">
-                <option value="javascript">JavaScript</option>
-                <option value="typescript">TypeScript</option>
-                <option value="python">Python</option>
-                <option value="java">Java</option>
-              </select>
+              <label className="block text-sm font-medium text-gray-300 mb-1">LLM API Key</label>
+              <textarea
+                name="apiKey"
+                value={settings.apiKey}
+                onChange={handleChange}
+                placeholder="Enter your API Key here..."
+                rows={2}
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+              />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-1">Preferred AI Model</label>
-              <select name="aiModel" value={settings.aiModel} onChange={handleChange} className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white">
-                <option value="gpt-4o">GPT-4o (Recommended)</option>
-                <option value="gpt-4">GPT-4</option>
-                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                <option value="claude-3-opus">Claude 3 Opus</option>
-              </select>
+              <textarea
+                name="aiModel"
+                value={settings.aiModel}
+                onChange={handleChange}
+                placeholder="gemini-3.5-flash"
+                rows={2}
+                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+              />
             </div>
           </div>
         </div>

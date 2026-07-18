@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { submitReview } from '../api/reviewApi';
+import { submitReview, getReview } from '../api/reviewApi';
 import toast from 'react-hot-toast';
 
 export const useReview = () => {
@@ -17,8 +17,9 @@ export const useReview = () => {
       const response = await submitReview({ code, language });
       setResult(response.data);
       toast.success('Review completed successfully!');
+      return response.data;
     } catch (err) {
-      toast.error(err.message || 'Failed to review code');
+      toast.error(err.response?.data?.message || err.message || 'Failed to review code');
       setResult(null);
     } finally {
       setLoading(false);
@@ -27,5 +28,18 @@ export const useReview = () => {
 
   const resetReview = () => setResult(null);
 
-  return { loading, result, analyzeCode, resetReview };
+  const loadReview = async (id) => {
+    setLoading(true);
+    try {
+      const response = await getReview(id);
+      setResult(response.data);
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message || 'Failed to load review');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { loading, result, analyzeCode, resetReview, loadReview };
 };

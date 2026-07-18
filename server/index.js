@@ -1,73 +1,40 @@
-import fs, { read, readFile } from "fs";
-import path from "path";
-import "dotenv/config";
-import readline from "readline";
+import express from 'express';
+// Force restart
+import cors from 'cors';
+import dotenv from 'dotenv';
+import connectDB from './db/index.js';
 
-import { ApiError } from "./utils/ApiError.js";
-import { ApiResponse } from "./utils/ApiResponse.js";
-import { review } from "./core/reviewEngine.js";
-import { readFileContent } from "./input/fileReader.js";
-import { readPastedCode } from "./input/pastedCodeReader.js";
-import { logger } from "./utils/logger.js";
+dotenv.config();
 
+const app = express();
+const PORT = process.env.PORT || 5000;
 
-await logger("AI Code review started");
+// Connect to MongoDB
+connectDB();
 
-async function promptUser(question) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.trim());
-    });
-  });
-}
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-async function main() {
-    try {
-        const cliInput = process.argv[2];
-        if (!cliInput) console.log("Please provide a file path or paste code.");
+// Routes
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
 
-        let sourceCode;
-        if (cliInput) {
-            if (fs.existsSync(cliInput) && fs.statSync(cliInput).isFile()) {
-                const filePath = path.resolve(cliInput);
-                sourceCode = await readFileContent(filePath);
-            } else {
-                // treat cliInput as raw code
-                sourceCode = cliInput;
-            }
-        } else {
-            const userInput = await promptUser("Enter file path (or press Enter to paste code): ");
-            if (userInput) {
-                if (fs.existsSync(userInput) && fs.statSync(userInput).isFile()) {
-                    const filePath = path.resolve(userInput);
-                    sourceCode = await readFileContent(filePath);
-                } else {
-                    sourceCode = userInput; // treat as code
-                }
-            } else {
-                // No path provided, read from stdin for pasted code
-                sourceCode = await readPastedCode();
-            }
-        }
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/reviews', reviewRoutes);
 
-        await logger(`Input received`);
+app.get('/', (req, res) => {
+  res.send('API is running...');
+});
 
-        const reviewResult = await review(sourceCode);
+// Basic error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, message: 'Server Error', error: err.message });
+});
 
-        console.log(reviewResult.data);
-
-        await logger("Review completed successfully.");
-
-        process.exit(0);
-    } catch (error) {
-        console.error("Error:", error.message || "Review Failed");
-        process.exit(1);
-    }
-}
-
-main();
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

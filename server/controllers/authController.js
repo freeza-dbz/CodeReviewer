@@ -15,9 +15,13 @@ export const login = async (req, res) => {
           token: generateToken(user._id),
           user: {
             id: user._id,
+            username: user.username,
             name: user.name,
             email: user.email,
-            avatar: 'https://i.pravatar.cc/150?u=' + user._id,
+            avatar: user.avatar || 'https://i.pravatar.cc/150?u=' + user._id,
+            preferredModel: user.preferredModel,
+            apiKey: user.apiKey,
+            theme: user.theme,
           }
         }
       });
@@ -30,7 +34,7 @@ export const login = async (req, res) => {
 };
 
 export const signup = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { username, name, email, password } = req.body;
 
   try {
     const userExists = await User.findOne({ email });
@@ -43,9 +47,11 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = await User.create({
+      username,
       name,
       email,
       password: hashedPassword,
+      avatar: req.body.avatar || 'https://i.pravatar.cc/150?u=' + email,
     });
 
     if (user) {
@@ -55,9 +61,13 @@ export const signup = async (req, res) => {
           token: generateToken(user._id),
           user: {
             id: user._id,
+            username: user.username,
             name: user.name,
             email: user.email,
-            avatar: 'https://i.pravatar.cc/150?u=' + user._id,
+            avatar: user.avatar,
+            preferredModel: user.preferredModel,
+            apiKey: user.apiKey,
+            theme: user.theme,
           }
         }
       });

@@ -16,7 +16,7 @@ export const submitReview = async (req, res) => {
       });
     }
 
-    const pipelineResult = await runPipeline(code);
+    const pipelineResult = await runPipeline(code, req.user.apiKey, req.user.preferredModel);
     const { parsedReview, staticAnalysis, language: detectedLang } = pipelineResult;
 
     const reviewSummary = parsedReview.summary || "No summary available.";
@@ -55,8 +55,8 @@ export const submitReview = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      success: true,
       data: {
+        id: review._id,
         summary: reviewSummary,
         issues: findings.map(f => ({
           id: f._id,
@@ -132,6 +132,7 @@ export const getReview = async (req, res) => {
       success: true,
       data: {
         summary: review.summary,
+        language: review.language,
         issues: findings.map(f => ({
           id: f._id,
           severity: f.severity,
@@ -149,6 +150,7 @@ export const getReview = async (req, res) => {
           medium: review.mediumCount,
           low: review.lowCount,
           score: review.reviewScore,
+          model: review.modelUsed,
         }
       }
     });

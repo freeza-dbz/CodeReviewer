@@ -9,7 +9,7 @@ import { formatResult } from "../report/formatter.js";
 import { logger } from "../utils/logger.js";
 
 
-const runPipeline = async (sourceCode) => {
+const runPipeline = async (sourceCode, apiKey, modelName) => {
 
     try {
         await logger("Detecting programming language....")
@@ -32,7 +32,7 @@ const runPipeline = async (sourceCode) => {
 
         await logger("Sending request to LLM....")
 
-        const llmResponse = await getLLMReview(prompt)
+        const llmResponse = await getLLMReview(prompt, apiKey, modelName)
 
         await logger("Parsing LLM response....")
 
@@ -48,7 +48,12 @@ const runPipeline = async (sourceCode) => {
 
         await logger("Review Successful")
 
-        return formatReport;
+        return {
+            formattedReport: formatReport,
+            parsedReview,
+            staticAnalysis,
+            language
+        };
 
     } catch (error) {
         await logger(`Review Failed with error: ${error.message}`)

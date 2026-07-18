@@ -28,22 +28,23 @@ const parseResponse = async function (responseText) {
 
         const issues = [];
 
-        const categories = [
-            "security",
-            "performance",
-            "bugs",
-            "maintainability"
-        ];
+        const categoryMapping = {
+            "security": "Security",
+            "performance": "Performance",
+            "bugs": "Bug",
+            "maintainability": "Maintainability"
+        };
 
-        for (const category of categories) {
-            const findings = parsed[category] || [];
+        for (const categoryKey of Object.keys(categoryMapping)) {
+            const findings = parsed[categoryKey] || [];
 
             for (const finding of findings) {
                 issues.push({
-                    category,
-                    severity: finding.severity || "medium",
+                    category: categoryMapping[categoryKey],
+                    severity: (finding.severity || "medium").toLowerCase(),
                     title: finding.title || "",
-                    description: finding.description || ""
+                    description: finding.description || "",
+                    suggestion: finding.suggestion || ""
                 });
             }
         }

@@ -1,9 +1,65 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-gray-900: #111827;
+  --color-gray-100: #f3f4f6;
+}
 
 @layer base {
   body {
-    @apply bg-gray-900 text-gray-100 font-sans;
+    background-color: var(--color-gray-900);
+    color: var(--color-gray-100);
+    font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  /* Light mode variable overrides */
+  .light {
+    --color-gray-950: #f9fafb;
+    --color-gray-900: #f3f4f6;  /* page background / main background */
+    --color-gray-800: #ffffff;  /* card background / sidebar background */
+    --color-gray-700: #e5e7eb;  /* border color */
+    --color-gray-450: #4b5563;  /* custom intermediary */
+    --color-gray-400: #4b5563;  /* sub-text */
+    --color-gray-300: #374151;  /* secondary text / labels */
+    --color-gray-200: #1f2937;  /* primary text */
+    --color-gray-100: #111827;  /* body main text color */
+  }
+
+  /* Specific light mode overrides for text-white elements that are actually headings */
+  .light h1.text-white, 
+  .light h2.text-white, 
+  .light h3.text-white, 
+  .light span.text-white,
+  .light div.text-white:not(.bg-blue-600 *):not(.bg-red-600 *),
+  .light p.text-white {
+    color: #111827 !important;
+  }
+
+  /* Dropdowns, forms and other select elements text */
+  .light select, 
+  .light input[type="text"], 
+  .light input[type="password"], 
+  .light input[type="email"],
+  .light input[type="file"] {
+    color: #111827 !important;
+    background-color: #ffffff !important;
+    border-color: #d1d5db !important;
+  }
+  
+  .light select option {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  /* Sidebar and other nav elements */
+  .light aside {
+    background-color: #ffffff !important;
+    border-color: #e5e7eb !important;
+  }
+
+  /* Fix navigation items and icons */
+  .light .hover\:bg-gray-800:hover {
+    background-color: #f3f4f6 !important;
   }
 }

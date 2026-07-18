@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Activity } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import CodeEditor from '../../components/CodeEditor/CodeEditor';
 import FileExplorer from '../../components/FileExplorer/FileExplorer';
 import UploadBox from '../../components/UploadBox/UploadBox';
@@ -11,15 +12,19 @@ import { useReview } from '../../hooks/useReview';
 import { SUPPORTED_LANGUAGES } from '../../constants/languages';
 
 const Review = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
   const { files, handleFileUpload } = useUpload();
-  const { loading, result, analyzeCode } = useReview();
+  const { loading, result, analyzeCode, loadReview } = useReview();
   const [activeFile, setActiveFile] = useState(null);
-  const [code, setCode] = useState('// Paste or upload your code here...');
+  const [code, setCode] = useState('// Paste your code here...');
   const [language, setLanguage] = useState('javascript');
+  const [inputMode, setInputMode] = useState('upload');
 
   useEffect(() => {
     if (files.length > 0 && !activeFile) {
       setActiveFile(files[0]);
+      setInputMode('upload');
     }
   }, [files, activeFile]);
 
@@ -35,8 +40,25 @@ const Review = () => {
     }
   }, [activeFile]);
 
-  const handleReview = () => {
-    analyzeCode(code, language);
+  useEffect(() => {
+    if (id) {
+      loadReview(id);
+      setInputMode('paste');
+      setCode('// Original code is not persisted. Showing analysis results on the right.');
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (result && result.language) {
+      setLanguage(result.language);
+    }
+  }, [result]);
+
+  const handleReview = async () => {
+    const resData = await analyzeCode(code, language);
+    if (resData && resData.id) {
+      navigate(`/review/${resData.id}`);
+    }
   };
 
   return (
@@ -63,15 +85,36 @@ const Review = () => {
       <div className="flex-1 flex gap-6 overflow-hidden">
         {/* Left Panel: Explorer & Editor */}
         <div className="flex-1 flex flex-col gap-4 overflow-hidden">
-          {files.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center">
+          {inputMode === 'upload' && files.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-6">
                <UploadBox onFileUpload={handleFileUpload} />
+               <div className="flex items-center gap-4 text-gray-500">
+                 <div className="h-px bg-gray-700 w-16"></div>
+                 <span>OR</span>
+                 <div className="h-px bg-gray-700 w-16"></div>
+               </div>
+               <Button variant="outline" onClick={() => { setInputMode('paste'); setCode('// Paste your code here...'); }}>
+                 Paste Code Manually
+               </Button>
             </div>
           ) : (
             <div className="flex-1 flex gap-4 overflow-hidden">
-              <div className="w-64 bg-gray-900 border border-gray-800 rounded-xl overflow-y-auto">
-                <div className="p-3 border-b border-gray-800 font-medium text-sm text-gray-300">Files</div>
-                <FileExplorer files={files} activeFile={activeFile} onSelectFile={setActiveFile} />
+              <div className="w-64 bg-gray-900 border border-gray-800 rounded-xl flex flex-col overflow-y-auto">
+                <div className="p-3 border-b border-gray-800 font-medium text-sm text-gray-300 flex justify-between items-center">
+                  Files
+                  {inputMode === 'paste' && (
+                    <button onClick={() => setInputMode('upload')} className="text-xs text-blue-400 hover:text-blue-300">
+                      Upload Instead
+                    </button>
+                  )}
+                </div>
+                {inputMode === 'paste' ? (
+                  <div className="p-4 text-sm text-gray-500 italic">
+                    Currently in Paste Mode. The code in the editor will be analyzed.
+                  </div>
+                ) : (
+                  <FileExplorer files={files} activeFile={activeFile} onSelectFile={setActiveFile} />
+                )}
               </div>
               <div className="flex-1 rounded-xl overflow-hidden shadow-2xl">
                  <CodeEditor code={code} language={language} onChange={setCode} />

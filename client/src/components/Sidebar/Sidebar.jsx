@@ -15,7 +15,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-screen fixed left-0 top-16">
+    <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col h-[calc(100vh-4rem)] fixed left-0 top-16">
       <div className="flex-1 py-6 flex flex-col gap-2 px-4">
         {navItems.map((item) => (
           <NavLink

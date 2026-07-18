@@ -3,8 +3,10 @@ import { getHistory } from '../../api/historyApi';
 import { formatDate } from '../../utils/formatDate';
 import { Eye } from 'lucide-react';
 import Button from '../../components/Button/Button';
+import { useNavigate } from 'react-router-dom';
 
 const History = () => {
+  const navigate = useNavigate();
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,7 +75,7 @@ const History = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={() => navigate(`/review/${item.id}`)}>
                         <Eye className="w-4 h-4 mr-2" />
                         View
                       </Button>

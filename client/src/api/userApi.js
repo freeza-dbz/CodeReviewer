@@ -1,25 +1,20 @@
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+import axios from 'axios';
+
+const getConfig = () => ({
+  headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+});
 
 export const getProfile = async () => {
-  await delay(600);
-  return {
-    success: true,
-    data: {
-      id: 'u1',
-      name: 'Test User',
-      email: 'test@example.com',
-      avatar: 'https://i.pravatar.cc/150?u=u1',
-      joinedDate: '2025-01-15T00:00:00Z',
-      totalReviews: 128,
-      preferredLanguage: 'JavaScript',
-    }
-  };
+  const { data } = await axios.get('/api/users/profile', getConfig());
+  return data;
 };
 
 export const updateSettings = async (settings) => {
-  await delay(800);
-  return {
-    success: true,
-    data: settings
-  };
+  const { data } = await axios.put('/api/users/settings', settings, getConfig());
+  return data;
+};
+
+export const getDashboardStats = async () => {
+  const { data } = await axios.get('/api/users/dashboard', getConfig());
+  return data;
 };

@@ -14,7 +14,7 @@ const Navbar = () => {
       <div className="flex items-center gap-4">
         {user && (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400">Welcome, <span className="text-gray-200">{user.name}</span></span>
+            <span className="text-sm text-gray-400">Welcome, <span className="text-gray-200">{user.username ? user.username : user.name}</span></span>
             <img src={user.avatar} alt="Avatar" className="w-8 h-8 rounded-full border border-gray-700" />
           </div>
         )}

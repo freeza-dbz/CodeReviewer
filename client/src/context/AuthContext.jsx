@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { login as apiLogin, logout as apiLogout } from '../api/authApi';
+import { getProfile } from '../api/userApi';
 import toast from 'react-hot-toast';
 
 export const AuthContext = createContext();
@@ -10,11 +11,19 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // In a real app, verify token with backend here
-    if (token) {
-      setUser({ id: 'u1', name: 'Test User', email: 'test@example.com', avatar: 'https://i.pravatar.cc/150?u=u1' });
-    }
-    setLoading(false);
+    const fetchUser = async () => {
+      if (token) {
+        try {
+          const res = await getProfile();
+          setUser(res.data);
+        } catch (error) {
+          console.error('Failed to fetch user context', error);
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
+    fetchUser();
   }, [token]);
 
   const login = async (credentials) => {
@@ -43,8 +52,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const updateUser = (updatedUser) => {
+    setUser((prev) => (prev ? { ...prev, ...updatedUser } : null));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

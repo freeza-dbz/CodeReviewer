@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { getProfile } from '../../api/userApi';
+import { getProfile, updateSettings } from '../../api/userApi';
 import { User, Mail, Calendar, Code, Star } from 'lucide-react';
 import { formatDate } from '../../utils/formatDate';
+import toast from 'react-hot-toast';
+import { useAuth } from '../../hooks/useAuth';
 
 const Profile = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [editData, setEditData] = useState({ username: '', name: '', email: '', password: '', avatar: '' });
+  const { updateUser } = useAuth();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -20,6 +25,32 @@ const Profile = () => {
     };
     fetchProfile();
   }, []);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditData((prev) => ({ ...prev, avatar: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await updateSettings(editData);
+      const res = await getProfile();
+      setProfile(res.data);
+      updateUser(res.data);
+      setEditMode(false);
+      toast.success('Profile updated');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update profile');
+    }
+  };
 
   if (loading) return <div className="text-gray-400">Loading profile...</div>;
   if (!profile) return null;
@@ -40,14 +71,97 @@ const Profile = () => {
           
           <div className="pt-16 flex justify-between items-start">
             <div>
-              <h2 className="text-2xl font-bold text-white mb-1">{profile.name}</h2>
-              <p className="text-gray-400 flex items-center gap-2"><Mail className="w-4 h-4" /> {profile.email}</p>
+                <h2 className="text-2xl font-bold text-white mb-1">{profile.name}</h2>
+                <h3 className="text-xl text-gray-300 mb-1">Username: {profile.username}</h3>
+                <p className="text-gray-400 flex items-center gap-2"><Mail className="w-4 h-4" /> {profile.email}</p>
+                <button onClick={() => {
+                  setEditMode(true);
+                  setEditData({
+                    username: profile.username || '',
+                    name: profile.name,
+                    email: profile.email,
+                    password: '',
+                    avatar: profile.avatar || ''
+                  });
+                }} className="mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded">Edit</button>
             </div>
-            <div className="flex gap-2">
-              <span className="bg-gray-900 border border-gray-700 text-gray-300 text-sm px-3 py-1 rounded-full flex items-center gap-1">
-                <Star className="w-4 h-4 text-yellow-500" /> Pro Member
-              </span>
-            </div>
+                <div className="flex gap-2">
+                  <span className="bg-gray-900 border border-gray-700 text-gray-300 text-sm px-3 py-1 rounded-full flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-500" /> Pro Member
+                  </span>
+                </div>
+                {editMode && (
+                  <form onSubmit={handleEditSubmit} className="space-y-4 mt-4 w-full max-w-md">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Username</label>
+                      <input
+                        type="text"
+                        name="username"
+                        placeholder="Username"
+                        value={editData.username}
+                        onChange={(e) => setEditData({ ...editData, username: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Name"
+                        value={editData.name}
+                        onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        value={editData.email}
+                        onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Password</label>
+                      <input
+                        type="password"
+                        name="password"
+                        placeholder="New Password"
+                        value={editData.password}
+                        onChange={(e) => setEditData({ ...editData, password: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Profile Photo (Upload from Local Storage)</label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none file:mr-4 file:py-1 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">or Profile Photo URL</label>
+                      <input
+                        type="text"
+                        name="avatar"
+                        placeholder="Profile Photo URL"
+                        value={editData.avatar}
+                        onChange={(e) => setEditData({ ...editData, avatar: e.target.value })}
+                        className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                      />
+                    </div>
+                    <button type="submit" className="px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded">Save</button>
+                  </form>
+                )}
           </div>
         </div>
       </div>

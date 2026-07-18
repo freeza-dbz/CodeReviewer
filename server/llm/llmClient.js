@@ -3,15 +3,23 @@ import { ApiError } from "../utils/ApiError.js";
 import { logger } from "../utils/logger.js"; 
 
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-3.5-flash" });
+
 
 const MAX_RETRIES = 3;
 
-const getLLMReview = async (prompt) => {
+const getLLMReview = async (prompt, userApiKey, modelName) => {
+
+    if (!userApiKey || !modelName) {
+        throw new ApiError(400, "API key and Preferred AI Model must be configured in Settings to perform code reviews.");
+    }
 
     try {
         let lastError;
+
+        const key = userApiKey;
+        const modelToUse = modelName;
+        const genAI = new GoogleGenerativeAI(key);
+        const model = genAI.getGenerativeModel({ model: modelToUse });
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
