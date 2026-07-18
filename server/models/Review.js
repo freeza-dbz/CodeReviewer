@@ -15,6 +15,9 @@ const reviewSchema = new mongoose.Schema(
     language: {
       type: String,
     },
+    code: {
+      type: String,
+    },
     reviewStatus: {
       type: String,
       enum: ['pending', 'in-progress', 'completed', 'failed'],

@@ -1,12 +1,12 @@
-import axios from 'axios';
+import api from './axiosConfig';
 
 export const login = async (credentials) => {
-  const { data } = await axios.post('/api/auth/login', credentials);
+  const { data } = await api.post('/api/auth/login', credentials);
   return data.data;
 };
 
 export const signup = async (userData) => {
-  const { data } = await axios.post('/api/auth/signup', userData);
+  const { data } = await api.post('/api/auth/signup', userData);
   return data.data;
 };
 
@@ -14,7 +14,7 @@ export const logout = async () => {
   const token = localStorage.getItem('token');
   if (token) {
     try {
-      await axios.post('/api/auth/logout', {}, {
+      await api.post('/api/auth/logout', {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (error) {

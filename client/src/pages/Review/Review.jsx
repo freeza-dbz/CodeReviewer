@@ -44,15 +44,22 @@ const Review = () => {
     if (id) {
       loadReview(id);
       setInputMode('paste');
-      setCode('// Original code is not persisted. Showing analysis results on the right.');
+      setCode('// Loading past review code...');
     }
   }, [id]);
 
   useEffect(() => {
-    if (result && result.language) {
-      setLanguage(result.language);
+    if (result) {
+      if (result.language) {
+        setLanguage(result.language);
+      }
+      if (result.code) {
+        setCode(result.code);
+      } else if (id) {
+        setCode('// Original code was not persisted for this old review. Showing analysis results on the right.');
+      }
     }
-  }, [result]);
+  }, [result, id]);
 
   const handleReview = async () => {
     const resData = await analyzeCode(code, language);

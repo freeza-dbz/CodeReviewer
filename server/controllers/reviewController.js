@@ -38,6 +38,7 @@ export const submitReview = async (req, res) => {
       user: req.user._id,
       project: project._id,
       language: detectedLang || language || 'javascript',
+      code: code,
       reviewStatus: 'completed',
       modelUsed: 'Gemini AI',
       reviewScore: score,
@@ -133,6 +134,7 @@ export const getReview = async (req, res) => {
       data: {
         summary: review.summary,
         language: review.language,
+        code: review.code,
         issues: findings.map(f => ({
           id: f._id,
           severity: f.severity,
