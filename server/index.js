@@ -14,7 +14,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://code-reviewer-f9pag9bho-freeza-dbzs-projects.vercel.app'],
+  origin: ['http://localhost:5173', 'https://code-reviewer-three-hazel.vercel.app'],
   credentials: true
 }));
 app.use(express.json());
