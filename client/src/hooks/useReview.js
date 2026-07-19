@@ -6,7 +6,7 @@ export const useReview = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
-  const analyzeCode = async (code, language) => {
+  const analyzeCode = async (code, language, projectName = 'Default Project') => {
     if (!code?.trim()) {
       toast.error('Please provide code to review.');
       return;
@@ -14,7 +14,7 @@ export const useReview = () => {
     
     setLoading(true);
     try {
-      const response = await submitReview({ code, language });
+      const response = await submitReview({ code, language, projectName });
       setResult(response.data);
       toast.success('Review completed successfully!');
       return response.data;

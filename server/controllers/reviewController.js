@@ -6,11 +6,12 @@ export const submitReview = async (req, res) => {
   try {
     const { code, language } = req.body;
     
-    let project = await Project.findOne({ owner: req.user._id });
+    const pName = req.body.projectName || 'Default Project';
+    let project = await Project.findOne({ owner: req.user._id, projectName: pName });
     if (!project) {
       project = await Project.create({
         owner: req.user._id,
-        projectName: 'Default Project',
+        projectName: pName,
         language: language || 'javascript',
         sourceType: 'paste'
       });

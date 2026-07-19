@@ -20,6 +20,7 @@ const Review = () => {
   const [code, setCode] = useState('// Paste your code here...');
   const [language, setLanguage] = useState('javascript');
   const [inputMode, setInputMode] = useState('upload');
+  const [projectName, setProjectName] = useState('My Project');
 
   useEffect(() => {
     if (files.length > 0 && !activeFile) {
@@ -62,7 +63,7 @@ const Review = () => {
   }, [result, id]);
 
   const handleReview = async () => {
-    const resData = await analyzeCode(code, language);
+    const resData = await analyzeCode(code, language, projectName);
     if (resData && resData.id) {
       navigate(`/review/${resData.id}`);
     }
@@ -73,6 +74,13 @@ const Review = () => {
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold text-white">Code Review</h1>
         <div className="flex items-center gap-4">
+          <input
+            type="text"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            placeholder="Project Name"
+            className="bg-gray-800 border border-gray-700 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+          />
           <select 
             value={language}
             onChange={(e) => setLanguage(e.target.value)}
