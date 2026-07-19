@@ -1,5 +1,6 @@
 import User from '../models/User.js';
 import Review from '../models/Review.js';
+import Project from '../models/Project.js';
 import bcrypt from 'bcryptjs';
 
 export const getProfile = async (req, res) => {
@@ -7,7 +8,14 @@ export const getProfile = async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
-      const totalReviews = await Review.countDocuments({ user: req.user._id });
+      const reviews = await Review.find({ user: req.user._id });
+      const totalReviews = reviews.length;
+      
+      const languageCounts = {};
+      reviews.forEach(r => {
+         const lang = r.language || 'unknown';
+         languageCounts[lang] = (languageCounts[lang] || 0) + 1;
+      });
 
       res.json({
         success: true,
@@ -19,7 +27,7 @@ export const getProfile = async (req, res) => {
           avatar: user.avatar || 'https://i.pravatar.cc/150?u=' + user._id,
           joinedDate: user.createdAt,
           totalReviews: totalReviews || 0,
-          preferredLanguage: 'JavaScript',
+          languageStats: languageCounts,
           preferredModel: user.preferredModel,
           apiKey: user.apiKey,
           theme: user.theme,

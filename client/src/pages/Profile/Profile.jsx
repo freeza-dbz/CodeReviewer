@@ -179,8 +179,19 @@ const Profile = () => {
         </div>
         <div className="bg-gray-800 border border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center text-center">
           <Star className="w-8 h-8 text-yellow-500 mb-3" />
-          <div className="text-gray-400 text-sm mb-1">Preferred Language</div>
-          <div className="text-white font-medium">{profile.preferredLanguage}</div>
+          <div className="text-gray-400 text-sm mb-2">Activity by Language</div>
+          <div className="text-white font-medium flex flex-col gap-1 w-full">
+            {profile.languageStats && Object.keys(profile.languageStats).length > 0 ? (
+              Object.entries(profile.languageStats).map(([lang, count]) => (
+                <div key={lang} className="flex justify-between w-full px-4 text-sm bg-gray-900 rounded py-1 border border-gray-700">
+                  <span className="capitalize">{lang}</span>
+                  <span className="text-blue-400">{count} item{count !== 1 ? 's' : ''}</span>
+                </div>
+              ))
+            ) : (
+              <span className="text-gray-500 text-sm">No activity yet</span>
+            )}
+          </div>
         </div>
       </div>
     </div>
