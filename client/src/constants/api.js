@@ -1,4 +1,4 @@
-export const API_BASE_URL = 'http://localhost:5000/api'; // Placeholder for future backend
+export const API_BASE_URL = 'https://codereviewer-qnsm.onrender.com/api'; // Placeholder for future backend
 
 export const ENDPOINTS = {
   LOGIN: '/auth/login',

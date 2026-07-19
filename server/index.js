@@ -13,7 +13,10 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://code-reviewer-f9pag9bho-freeza-dbzs-projects.vercel.app'],
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
