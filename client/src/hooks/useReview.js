@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { submitReview, getReview } from '../api/reviewApi';
+import { submitReview, getReview, submitFolderReview } from '../api/reviewApi';
 import toast from 'react-hot-toast';
 
 export const useReview = () => {
@@ -26,6 +26,32 @@ export const useReview = () => {
     }
   };
 
+  const analyzeFolder = async (files, projectName = 'Default Project') => {
+    if (!files || files.length === 0) {
+      toast.error('Please provide a folder with files to review.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('projectName', projectName);
+    files.forEach(f => {
+      formData.append('files', f.raw, f.path);
+    });
+
+    setLoading(true);
+    try {
+      const response = await submitFolderReview(formData);
+      setResult(response.data);
+      toast.success('Folder review completed successfully!');
+      return response.data;
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.message || 'Failed to review folder');
+      setResult(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const resetReview = () => setResult(null);
 
   const loadReview = async (id) => {
@@ -41,5 +67,5 @@ export const useReview = () => {
     }
   };
 
-  return { loading, result, analyzeCode, resetReview, loadReview };
+  return { loading, result, analyzeCode, analyzeFolder, resetReview, loadReview };
 };

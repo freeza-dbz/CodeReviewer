@@ -15,7 +15,7 @@ const Review = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { files, handleFileUpload } = useUpload();
-  const { loading, result, analyzeCode, loadReview } = useReview();
+  const { loading, result, analyzeCode, analyzeFolder, loadReview } = useReview();
   const [activeFile, setActiveFile] = useState(null);
   const [code, setCode] = useState('// Paste your code here...');
   const [language, setLanguage] = useState('javascript');
@@ -63,7 +63,13 @@ const Review = () => {
   }, [result, id]);
 
   const handleReview = async () => {
-    const resData = await analyzeCode(code, language, projectName);
+    let resData;
+    if (inputMode === 'upload') {
+      resData = await analyzeFolder(files, projectName);
+    } else {
+      resData = await analyzeCode(code, language, projectName);
+    }
+    
     if (resData && resData.id) {
       navigate(`/review/${resData.id}`);
     }

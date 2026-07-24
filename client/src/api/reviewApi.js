@@ -13,3 +13,10 @@ export const getReview = async (id) => {
   const { data } = await api.get(`/api/reviews/${id}`, getConfig());
   return data;
 };
+
+export const submitFolderReview = async (formData) => {
+  const config = getConfig();
+  config.headers['Content-Type'] = 'multipart/form-data';
+  const { data } = await api.post('/api/reviews/folder', formData, config);
+  return data;
+};
